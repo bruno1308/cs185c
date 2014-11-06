@@ -1,0 +1,8 @@
+name: Economy
+main: edu.sjsu.cs185c.plugin.Plugin
+version: 0.1
+author: Bruno Lopes
+
+commands:
+  econ:
+  karma:
