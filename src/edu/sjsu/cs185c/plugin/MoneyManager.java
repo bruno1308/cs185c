@@ -29,4 +29,8 @@ public class MoneyManager {
 	public static Plugin getPlugin(){
 		return plugin;
 	}
+	
+	public static void addBalance(String name, Double amount){
+		balances.put(name, getBalance(name)+amount);
+	}
 }

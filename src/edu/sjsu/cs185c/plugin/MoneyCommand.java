@@ -7,11 +7,16 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import edu.sjsu.cs185c.util.ErrorHandler;
+import edu.sjsu.cs185c.util.MapUtil;
 
 public class MoneyCommand implements CommandExecutor {
 
 	public boolean onCommand(CommandSender cs, Command arg1, String arg2,
 			String[] args) {
+		
 		if(args[0].equalsIgnoreCase("ranking")){
 			try{
 				HashMap<String,Double> all =MoneyManager.getAllBalances();
@@ -25,52 +30,48 @@ public class MoneyCommand implements CommandExecutor {
 				return true;
 			}catch(Exception e){
 				//e.printStackTrace();
-				cs.sendMessage(ChatColor.RED+"Command error: "+e.toString());
+				cs.sendMessage(ErrorHandler.WRONG_COMMAND_USAGE.toString());
 				return false;
 			}
-		}
-		if(args.length < 2){
-			cs.sendMessage(ChatColor.RED+"Wrong command usage");
-			cs.sendMessage(ChatColor.GREEN+"Usage: /econ <add/remove/set/get> <player> <amount>");
-			return false;
-		}
-		if(MoneyManager.hasAccount(args[1])){
+		}else{
+		if(!MoneyManager.hasAccount(args[1])) {cs.sendMessage(ErrorHandler.INEXISTENT_PLAYER.toString()); return false;}
+		
 		if(args[0].equalsIgnoreCase("add")){
-			
+				if(!cs.hasPermission("economy.money.add")) {cs.sendMessage(ErrorHandler.PERMISSION_DENIED.toString()); return false;}
 				try{
 					Double amount = Double.parseDouble(args[2]);
 					cs.sendMessage(ChatColor.GREEN+"Add balance complete: "+Double.toString(amount) +" + " + Double.toString(MoneyManager.getBalance(args[1])));
 					MoneyManager.setBalance(args[1], (MoneyManager.getBalance(args[1])+amount));
 					return true;
 				}catch(Exception e){
-					cs.sendMessage(ChatColor.RED+"Wrong amount value");
+					cs.sendMessage(ErrorHandler.INVALID_NUMBER.toString());
 					return false;
 				}
 			
 			
 		}else if(args[0].equalsIgnoreCase("remove")){
-			
+			if(!cs.hasPermission("economy.money.remove")) {cs.sendMessage(ErrorHandler.PERMISSION_DENIED.toString()); return false;}
 				try{
 					Double amount = Double.parseDouble(args[2]);
 					MoneyManager.setBalance(args[1],MoneyManager.getBalance(args[1])-amount);
 					cs.sendMessage(ChatColor.GREEN+"Remove balance complete");
 					return true;
 				}catch(Exception e){
-					cs.sendMessage(ChatColor.RED+"Wrong amount value");
+					cs.sendMessage(ErrorHandler.INVALID_NUMBER.toString());
 					
 					return false;
 				}
 			}
 			
 		else if(args[0].equalsIgnoreCase("set")){
-			
+			if(!cs.hasPermission("economy.money.set")) {cs.sendMessage(ErrorHandler.PERMISSION_DENIED.toString()); return false;}
 				try{
 					Double amount = Double.parseDouble(args[2]);
 					MoneyManager.setBalance(args[1], amount);
 					cs.sendMessage(ChatColor.GREEN+"Set balance complete");
 					return true;
 				}catch(Exception e){
-					cs.sendMessage(ChatColor.RED+"Wrong amount value");
+					cs.sendMessage(ErrorHandler.INVALID_NUMBER.toString());
 					return false;
 				}
 			}
@@ -82,18 +83,34 @@ public class MoneyCommand implements CommandExecutor {
 			}catch(Exception e){
 				return false;
 			}
+		}else if(args[0].equalsIgnoreCase("transfer")){
+			try{
+				Player me = (Player)cs;
+				String receiver=args[1];
+				Double my_bal = MoneyManager.getBalance(me.getName());
+				Double amount= Double.parseDouble(args[2]);
+				if(my_bal>=amount){
+					MoneyManager.setBalance(me.getName(), my_bal-amount);
+					MoneyManager.setBalance(receiver, MoneyManager.getBalance(receiver) + amount);		
+					cs.sendMessage(ChatColor.GREEN+"Transferred: "+Double.toString(amount)+" to "+receiver);
+					return true;
+				}else{
+					cs.sendMessage(ErrorHandler.NOT_ENOUGH_MONEY.toString());
+					return false;
+				}
+				
+			}catch(Exception e){
+				return false;
+			}
 		}
 		else{
-			cs.sendMessage(ChatColor.RED+"Wrong command usage");
+			cs.sendMessage(ErrorHandler.INEXISTENT_COMMAND.toString());
 			return false;
 		}
-		}else{
-			cs.sendMessage(ChatColor.RED+"Player doesn't have an account");
-			return false;
-		}
-		
-		
+		}		
 		
 	}
+	
+	
 
 }

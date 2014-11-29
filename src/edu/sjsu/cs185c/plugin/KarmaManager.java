@@ -29,5 +29,9 @@ public class KarmaManager {
 	public static Plugin getPlugin(){
 		return plugin;
 	}
+	
+	public static void addKarma(String name, Integer amount){
+		karmas.put(name,getKarma(name)+amount);
+	}
 
 }

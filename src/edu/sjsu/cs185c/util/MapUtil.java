@@ -1,4 +1,4 @@
-package edu.sjsu.cs185c.plugin;
+package edu.sjsu.cs185c.util;
 
 import java.util.*;
 
@@ -24,4 +24,7 @@ public class MapUtil
         }
         return result;
     }
-}
+
+
+
+  }

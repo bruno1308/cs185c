@@ -1,8 +1,17 @@
-name: Economy
+name: EconomyPlugin
 main: edu.sjsu.cs185c.plugin.Plugin
-version: 0.1
-author: Bruno Lopes
+version: 0.1.1
 
 commands:
-  econ:
-  karma:
+    money:
+        description: Money operations
+        usage: /money
+    karma:
+        description: Karma operations
+        usage: /karma
+    ach:
+        description: Achievements operations
+        usage: /ach
+    prof:
+        description: Profession operations
+        usage: /prof

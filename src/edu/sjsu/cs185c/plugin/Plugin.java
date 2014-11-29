@@ -1,12 +1,19 @@
 package edu.sjsu.cs185c.plugin;
 
+import net.minecraft.server.v1_7_R3.AchievementList;
+
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.Command;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -16,8 +23,11 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
 import org.bukkit.event.*;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
@@ -82,41 +92,39 @@ public class Plugin extends JavaPlugin{
             @EventHandler
             public void playerJoin(PlayerJoinEvent event) {
                 // On player join send them the message from config.yml
-                event.getPlayer().sendMessage(Plugin.this.getConfig().getString("message"));
-                if(!MoneyManager.hasAccount(event.getPlayer().getName())){
-                	MoneyManager.setBalance(event.getPlayer().getName(), 1000.0);
-         
-                }else if(!KarmaManager.hasKarma(event.getPlayer().getName())){
-                	KarmaManager.setKarma(event.getPlayer().getName(), 0);
-                }
+               MyEventHandler.onPlayerJoin(event);
+               event.getPlayer().sendMessage(Plugin.this.getConfig().getString("message"));
             	
             }
             
             @EventHandler
-            public void Playerdeath(PlayerDeathEvent e) {
-            String killers_name = e.getEntity().getKiller().getName();
-            String dead_name = e.getEntity().getName();
-            if (KarmaManager.hasKarma(killers_name) && KarmaManager.hasKarma(dead_name)){
-            	int killers_karma = KarmaManager.getKarma(killers_name);
-            	int dead_karma = KarmaManager.getKarma(dead_name);
-            	if(dead_karma<0){
-            		if(dead_karma < killers_karma)
-            		killers_karma++;
-            		else
-            		killers_karma--;
-            	}else{
-            		if(dead_karma < killers_karma)
-                		killers_karma--;
-                		else
-                		killers_karma-=3;
-            	}
-                
-                }
+            public void playerDeath(PlayerDeathEvent e) {
+            	MyEventHandler.onPlayerDeath(e);
             }
+            
+            @EventHandler
+            public void onKillEntity(EntityDeathEvent event){
+            	MyEventHandler.onEntityDeath(event);
+            }
+            
+            @EventHandler
+            public void onMove(PlayerMoveEvent e){
+            	MyEventHandler.onPlayerMove(e);
+            }
+            
+            @EventHandler
+            public void onBlockDestroy(BlockBreakEvent e){
+            	MyEventHandler.onBlockDestroy(e);
+            }
+            
         }, this);
+        
+        
 
-        getCommand("econ").setExecutor(new MoneyCommand());
+        getCommand("money").setExecutor(new MoneyCommand());
         getCommand("karma").setExecutor(new KarmaCommand());
+        getCommand("ach").setExecutor(new AchievementCommand());
+        getCommand("prof").setExecutor(new ProfessionCommand());
         
 	}
 	
@@ -126,6 +134,7 @@ public class Plugin extends JavaPlugin{
 		getLogger().info ("Server turning off");
 		ServerPersistence.saveData();
 	}
+
 	
     public void logToFile(String message)
     {
