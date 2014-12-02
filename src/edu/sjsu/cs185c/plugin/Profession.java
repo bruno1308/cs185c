@@ -4,13 +4,25 @@ public class Profession {
 	private ProfessionType pt;
 	private int level;
 	private Double wage;
-	private int experience;
+	private Double experience;
+	private final int EXP_FACTOR =1;
+	private int drop_rate;
 	
+	public int getDrop_rate() {
+		return drop_rate;
+	}
+	public void setDrop_rate(int drop_rate) {
+		this.drop_rate = drop_rate;
+	}
 	public Profession(ProfessionType newpt){
 		this.pt = newpt;
 		level =0;
-		experience=0;
+		experience=0D;
+		drop_rate=0;
 		wage=100D;
+		if(newpt == ProfessionType.MINER){
+			drop_rate=10;
+		}
 	}
 	public ProfessionType getPt() {
 		return pt;
@@ -30,11 +42,32 @@ public class Profession {
 	public void setWage(Double wage) {
 		this.wage = wage;
 	}
-	public int getExperience() {
+	public Double getExperience() {
 		return experience;
 	}
-	public void setExperience(int experience) {
+	public void setExperience(Double experience) {
 		this.experience = experience;
+	}
+	public void addExperience(double exp) {
+		this.experience+=exp;
+	}
+	public int calculateLevel(){
+		int new_level;
+		new_level = (int)(EXP_FACTOR * Math.sqrt(experience));
+		return new_level;
+	}
+	public boolean checkUpLevel(){
+		int level_now = this.level;
+		int level_next = calculateLevel();
+		if(level_now!=level_next){
+			this.level = level_next;
+			this.drop_rate = (level_next + 10)+((level_next/10)*5);
+			if(this.drop_rate>=100) this.drop_rate = 100;
+			wage+=100;
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 

@@ -14,4 +14,7 @@ commands:
         usage: /ach
     prof:
         description: Profession operations
-        usage: /prof
+        usage: /prof <change/list> <new_prof>
+    shop:
+        description: Shopping operations
+        usage: /shop <buy/sell/price> <item_name>

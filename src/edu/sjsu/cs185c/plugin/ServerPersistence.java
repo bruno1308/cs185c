@@ -97,10 +97,8 @@ public class ServerPersistence {
 	public static void saveAchievementsStatus(){
 		HashMap<String,List<AchievementStatus>> my_list = AchievementManager.getAllAchievementsStatus();
 		for(String player : my_list.keySet()){
-			System.out.println("Persisting player: "+player);
 			List<AchievementStatus> status_list = my_list.get(player);
 			for(AchievementStatus e:status_list){
-				System.out.println("Persisting ach number: "+e.getAch_id());
 				int ach_id = e.getAch_id();
 				int progress = e.getProgress();
 				boolean done = e.getDone();
@@ -116,14 +114,12 @@ public class ServerPersistence {
 		if(!p.getConfig().contains("achievement_status")) return;
 	
 		for(String player :p.getConfig().getConfigurationSection("achievement_status").getKeys(false)){
-			System.out.println("Loading ach status for: "+player);
 			List<AchievementStatus> as_list = new ArrayList<AchievementStatus>();
 			for(String ach_id: p.getConfig().getConfigurationSection("achievement_status."+player).getKeys(false)){
 				
 				AchievementStatus as =new AchievementStatus();
 				String is_done = p.getConfig().getString("achievement_status."+player+"."+ach_id+".done");
 				as.setAch_id(Integer.parseInt(ach_id));
-				System.out.println("Loading achievement number for: "+ach_id+ "  Is it done?"+is_done);
 				as.setDone(Boolean.valueOf(is_done));
 				as.setProgress(p.getConfig().getInt("achievement_status."+player+"."+ach_id+".progress"));
 				as_list.add(as);
@@ -137,14 +133,16 @@ public class ServerPersistence {
 		for(String player : my_list.keySet()){
 			//System.out.println("Persisting player: "+player);
 			Profession pr = my_list.get(player);
-			int exp = pr.getExperience();
+			Double exp = pr.getExperience();
 			int level = pr.getLevel();
 			Double wage = pr.getWage();
 			ProfessionType pt = pr.getPt();
+			int drop_rate = pr.getDrop_rate();
 			p.getConfig().set("profession."+player+".type",pt.toString().toUpperCase());
 			p.getConfig().set("profession."+player+".level",level);
 			p.getConfig().set("profession."+player+".exp",exp);
-			p.getConfig().set("profession."+player+".wage",wage);		
+			p.getConfig().set("profession."+player+".wage",wage);
+			p.getConfig().set("profession."+player+".drop_rate",drop_rate);
 		}
 		p.saveConfig();
 	}
@@ -156,9 +154,10 @@ public class ServerPersistence {
 			
 			pt = ProfessionType.valueOf(p.getConfig().getString("profession."+name+".type"));
 			Profession prof = new Profession(pt);
-			prof.setExperience(p.getConfig().getInt("profession."+name+".exp"));
+			prof.setExperience(p.getConfig().getDouble("profession."+name+".exp"));
 			prof.setLevel(p.getConfig().getInt("profession."+name+".level"));
 			prof.setWage(p.getConfig().getDouble("profession."+name+".wage"));
+			prof.setDrop_rate(p.getConfig().getInt("profession."+name+".drop_rate"));
 			prof.setPt(pt);
 			ProfessionManager.setProfession(name, prof);
 		}

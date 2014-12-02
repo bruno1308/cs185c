@@ -4,21 +4,28 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 
-import edu.sjsu.cs185c.util.MapUtil;
 import edu.sjsu.cs185c.util.MathUtil;
 
+
 public class MyEventHandler {
+	public final static double MIN_DIST = 5D;
 	public static void onPlayerDeath(PlayerDeathEvent e){
 		if(!(e.getEntity().getKiller() instanceof Player))return;
         String killers_name = e.getEntity().getKiller().getName();
@@ -92,14 +99,12 @@ public class MyEventHandler {
     	HashMap<Integer,Achievement> my_list = AchievementManager.getAllAchievements();
     	if(my_list!= null){
     		for(int ids:my_list.keySet()){
-    			/*System.out.println("Destroyed block: "+b.getType());
-    			System.out.println("Converting "+Material.valueOf(my_list.get(ids).getEntity_target()));
-    			System.out.println("I had "+my_list.get(ids).getEntity_target());*/
     			if(my_list.get(ids).getType() == Type.DESTROY_BLOCK && Material.valueOf(my_list.get(ids).getEntity_target()) == b.getType()){
     				saveCode(p,ids,my_list);            				
     			}
     		}
     	}
+		minerBreakingBlock(e);
 		
 	}
 
@@ -111,9 +116,20 @@ public class MyEventHandler {
     		for(int ids:my_list.keySet()){
     			if(my_list.get(ids).getType() == Type.VISIT){
     				HashMap<String,List<AchievementStatus>> ach_list = AchievementManager.getAllAchievementsStatus();
-    				if(MathUtil.getDistance(p.getLocation().getX(),p.getLocation().getY(),  p.getLocation().getZ(),
-    						my_list.get(ids).getX(), my_list.get(ids).getY(),my_list.get(ids).getZ())<=5.0) {
-        				if(ach_list!=null){
+    				if(ach_list!=null){
+    					Double px=p.getLocation().getX();
+    					Double py=p.getLocation().getY();
+    					Double pz=p.getLocation().getZ();
+    					Double achx=my_list.get(ids).getX();
+    					Double achy=my_list.get(ids).getY();
+    					Double achz=my_list.get(ids).getZ();
+    					Double dist = 0D;
+    					try{
+    						dist =MathUtil.getDistance(px,py,pz,achx,achy,achz);
+    					}catch(Exception ex){
+    						dist =MIN_DIST*2;
+    					}
+    					if(dist<= MIN_DIST) {
         					List<AchievementStatus> player_list = ach_list.get(p.getName());
         					for(AchievementStatus as: player_list){
         						if(as.getDone() != true && as.getAch_id() == ids){
@@ -142,6 +158,97 @@ public class MyEventHandler {
          AchievementManager.onPlayerLogin(event.getPlayer());
 		
 	}
-
 	
-}
+	public static void minerBreakingBlock(BlockBreakEvent e){
+		Block b = e.getBlock();
+		Location loc = b.getLocation();
+    	Player p = e.getPlayer();
+    	Material m = b.getType();
+    	System.out.println("Name is: "+m.toString());
+    	Profession player_prof = ProfessionManager.getProfessionByName(p.getName());
+    	if(player_prof.getPt()==ProfessionType.MINER && m.isBlock()){
+    		int rand = MathUtil.randInt(1, 100);
+    		if(player_prof.getDrop_rate() > rand){
+    			b.getWorld().dropItem(loc, new ItemStack(b.getType(), 1));
+    			p.sendMessage(ChatColor.YELLOW+"Double drop!");
+    		}
+    		try{
+    			double exp = BlockValues.valueOf(m.toString()).getValue();
+    			player_prof.addExperience(exp);
+    			p.sendMessage(ChatColor.WHITE+"+"+Double.toString(exp)+" exp");
+    			if(player_prof.checkUpLevel()){
+    				p.sendMessage(ChatColor.BLUE+"Level up!");
+    			}
+    		}catch(Exception ex){
+    			System.out.println("Block yet not supported");
+    		}
+    	}else{
+    		return;
+    	}
+		
+	}
+
+	public static void onCraftItem(CraftItemEvent e) {
+		Recipe r = e.getRecipe();
+        ItemStack item = r.getResult();
+        Material m = item.getType();
+        HumanEntity p = e.getWhoClicked();
+        
+        if(isWeapon(m.toString()) || isChestPlate(m.toString()) || isLeggings(m.toString()) || isBoots(m.toString())){
+        	p.getInventory().removeItem(new ItemStack(m,1));
+        	Player player = (Player) p;
+        	player.updateInventory();
+        }
+	}
+	
+	public static boolean isWeapon(String test) {
+
+	    for (WeaponType c : WeaponType.values()) {
+	        if (c.name().equals(test)) {
+	            return true;
+	        }
+	    }
+
+	    return false;
+	}
+	public static boolean isChestPlate(String test) {
+
+	    for (ChestPlateType c : ChestPlateType.values()) {
+	        if (c.name().equals(test)) {
+	            return true;
+	        }
+	    }
+
+	    return false;
+	}
+	public static boolean isBoots(String test) {
+
+	    for (BootsType c : BootsType.values()) {
+	        if (c.name().equals(test)) {
+	            return true;
+	        }
+	    }
+
+	    return false;
+	}
+	public static boolean isLeggings(String test) {
+
+	    for (LeggingsType c : LeggingsType.values()) {
+	        if (c.name().equals(test)) {
+	            return true;
+	        }
+	    }
+
+	    return false;
+	}
+
+	public static void onCustomCraft(PrepareItemCraftEvent e) {
+		Material m = e.getInventory().getResult().getType();
+		if(isWeapon(m.toString()) || isChestPlate(m.toString()) || isLeggings(m.toString()) || isBoots(m.toString())){
+			e.getInventory().setResult(new ItemStack(Material.LOG, 1));
+			}
+		}
+	
+	}
+
+

@@ -2,6 +2,8 @@ package edu.sjsu.cs185c.plugin;
 
 import java.util.HashMap;
 
+import org.bukkit.Material;
+
 public class MoneyManager {
 	private static HashMap<String, Double> balances = new HashMap<String, Double>();
 	static Plugin plugin;

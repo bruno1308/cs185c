@@ -9,9 +9,11 @@ public enum ErrorHandler {
 	INVALID_COMMAND("Invalid command."),
 	INEXISTENT_COMMAND("Command doesn't exist."),
 	INEXISTENT_PLAYER("Player doesn't exist."),
+	INEXISTENT_ITEM("Item doesn't exist."),
 	INEXISTENT_PROFESSION("This profession doesn't exist."),
 	INVALID_NUMBER("Amount provided is not a number."),
-	NOT_ENOUGH_MONEY("You don't have enough money to transfer."),
+	NOT_ENOUGH_MONEY("You don't have enough money."),
+	NOT_HAVE_ITEM("You don't have this item to sell."),
 	WRONG_COMMAND_USAGE("Wrong command usage."),
 	WRONG_NUMBER_OF_PARMS("Wrong number of parameters.");
 

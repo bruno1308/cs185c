@@ -25,13 +25,11 @@ public class AchievementManager {
 		AchievementStatus as = new AchievementStatus();
 		as.setAch_id(id);
 		if(player_ach.get(name)!= null){
-			System.out.println("Player already has list, just add this achiev.: ");
 			player_ach.get(name).add(as);
 		}
 		else{
 			List<AchievementStatus> my_list= new ArrayList<AchievementStatus>();
 			my_list.add(as);
-			System.out.println("Creating new AchievementStatus list for "+name+ " with the ach id: "+id);
 			player_ach.put(name, my_list);
 		}
 	}
@@ -87,15 +85,12 @@ public class AchievementManager {
 		Set<Integer> ach_have = new HashSet<Integer>();
 		if(player_achlist != null ){
 			for(AchievementStatus as:player_achlist){
-				System.out.println("Player has number "+as.getAch_id());
 				ach_have.add(as.getAch_id());
 			}
 		}
 		for(Integer id:achievements.keySet()){
-			System.out.println("Checking if player has ach id: "+id);
 			if(!ach_have.contains(id)){
 				addAchtoPlayer(id,p.getDisplayName());
-				System.out.println("Adding number "+id+ "to "+p.getDisplayName());
 			}
 		}	
 		
@@ -114,8 +109,10 @@ public class AchievementManager {
 			Integer int_amount =amount.intValue();
 			KarmaManager.addKarma(name, int_amount);
 		}
-		p.sendMessage(ChatColor.YELLOW+"Achievement number "+ids+" completed! You received "+ach.getReward_amount()+" "+ach.getReward_type().toString());
-		
+		if(ach.getReward_type() == RewardType.MONEY)
+			p.sendMessage(ChatColor.YELLOW+"Achievement number "+ids+" completed! You received "+ach.getReward_amount()+"$");
+		else 
+			p.sendMessage(ChatColor.YELLOW+"Achievement number "+ids+" completed! You received "+ach.getReward_amount()+" karma");
 	}
 
 	

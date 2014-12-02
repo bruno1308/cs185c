@@ -2,6 +2,8 @@ package edu.sjsu.cs185c.plugin;
 
 import java.util.HashMap;
 
+import org.bukkit.Material;
+
 public class ProfessionManager {
 	private static HashMap<String, Profession> professions = new HashMap<String, Profession>();
 	static Plugin plugin;

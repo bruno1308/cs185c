@@ -1,5 +1,7 @@
 package edu.sjsu.cs185c.util;
 
+import java.util.Random;
+
 public class MathUtil {
     public static double getDistance(double x1, double y1, double z1, double x2, double y2, double z2)
     {
@@ -9,6 +11,11 @@ public class MathUtil {
 
       // We should avoid Math.pow or Math.hypot due to perfomance reasons
       return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+    public static int randInt(int min, int max) {
+	    Random rand = new Random();
+	    int randomNum = rand.nextInt((max - min) + 1) + min;
+	    return randomNum;
     }
 
 }

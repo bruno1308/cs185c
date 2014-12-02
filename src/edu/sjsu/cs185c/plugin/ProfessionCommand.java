@@ -16,7 +16,7 @@ public class ProfessionCommand implements CommandExecutor{
 				if(args.length !=2) {cs.sendMessage(ErrorHandler.WRONG_NUMBER_OF_PARMS.toString()); return false;}
 				try{
 				if(!cs.hasPermission("economy.profession.change")) {cs.sendMessage(ErrorHandler.PERMISSION_DENIED.toString());return false;}
-				ProfessionType new_pt = ProfessionType.valueOf(args[1]);
+				ProfessionType new_pt = ProfessionType.valueOf(args[1].toUpperCase());
 				Profession new_prof = new Profession(new_pt);
 				ProfessionManager.setProfession(cs.getName(), new_prof);
 				cs.sendMessage(ChatColor.GREEN+"Profession changed successfully to "+args[1]);
@@ -38,6 +38,11 @@ public class ProfessionCommand implements CommandExecutor{
 				if(!MoneyManager.hasAccount(args[1])){cs.sendMessage(ErrorHandler.INEXISTENT_PLAYER.toString()); return false;}
 				ProfessionType type = ProfessionManager.getProfessionByName(args[1]).getPt();
 				cs.sendMessage(ChatColor.GREEN+args[1]+" is a/an "+type.toString());
+			}else if(args[0].equalsIgnoreCase("level")){
+				if(args.length !=2) {cs.sendMessage(ErrorHandler.WRONG_NUMBER_OF_PARMS.toString()); return false;}
+				if(!MoneyManager.hasAccount(args[1])){cs.sendMessage(ErrorHandler.INEXISTENT_PLAYER.toString()); return false;}
+				int level = ProfessionManager.getProfessionByName(args[1]).getLevel();
+				cs.sendMessage(ChatColor.GREEN+args[1]+" is level "+Integer.toString(level));
 			} else {cs.sendMessage(ErrorHandler.INEXISTENT_COMMAND.toString()); return false;}
 		return false;
 	}
