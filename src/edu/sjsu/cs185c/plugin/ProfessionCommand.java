@@ -15,16 +15,15 @@ public class ProfessionCommand implements CommandExecutor{
 			if(args[0].equalsIgnoreCase("change")){
 				if(args.length !=2) {cs.sendMessage(ErrorHandler.WRONG_NUMBER_OF_PARMS.toString()); return false;}
 				try{
-				if(!cs.hasPermission("economy.profession.change")) {cs.sendMessage(ErrorHandler.PERMISSION_DENIED.toString());return false;}
-				ProfessionType new_pt = ProfessionType.valueOf(args[1].toUpperCase());
-				Profession new_prof = new Profession(new_pt);
-				ProfessionManager.setProfession(cs.getName(), new_prof);
-				cs.sendMessage(ChatColor.GREEN+"Profession changed successfully to "+args[1]);
-				return true;
+					if(!cs.hasPermission("economy.profession.change")) {cs.sendMessage(ErrorHandler.PERMISSION_DENIED.toString());return false;}
+					ProfessionType new_pt = ProfessionType.valueOf(args[1].toUpperCase());
+					Profession new_prof = new Profession(new_pt);
+					ProfessionManager.setProfession(cs.getName(), new_prof);
+					cs.sendMessage(ChatColor.GREEN+"Profession changed successfully to "+args[1]);
+					return true;
 				}catch(IllegalArgumentException ie){
 					cs.sendMessage(ErrorHandler.INEXISTENT_PROFESSION.toString());
-					}
-				
+					}	
 			}
 			else if(args[0].equalsIgnoreCase("list")){
 				if(args.length !=1) {cs.sendMessage(ErrorHandler.WRONG_NUMBER_OF_PARMS.toString()); return false;}

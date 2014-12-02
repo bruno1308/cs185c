@@ -56,7 +56,7 @@ public class Profession {
 		new_level = (int)(EXP_FACTOR * Math.sqrt(experience));
 		return new_level;
 	}
-	public boolean checkUpLevel(){
+	public int checkUpLevel(){
 		int level_now = this.level;
 		int level_next = calculateLevel();
 		if(level_now!=level_next){
@@ -64,10 +64,8 @@ public class Profession {
 			this.drop_rate = (level_next + 10)+((level_next/10)*5);
 			if(this.drop_rate>=100) this.drop_rate = 100;
 			wage+=100;
-			return true;
-		}else{
-			return false;
 		}
+		return level_next -level_now;
 	}
 	
 

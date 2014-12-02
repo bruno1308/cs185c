@@ -12,6 +12,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -71,10 +72,24 @@ public class MyEventHandler {
     		}
     		
     	}
+    	checkAssassin(event);
 		
 	}
 	
 	
+	private static void checkAssassin(EntityDeathEvent event) {
+		Entity dead = event.getEntity();
+    	Player  p = event.getEntity().getKiller();
+    	Profession prof = ProfessionManager.getProfessionByName(p.getName());
+    	//TODO MONSTERMANAGER with different xp for each monster
+    	if(prof.getPt() == ProfessionType.ASSASSIN){
+    		afterExp(prof, 5D, p);
+    		if(dead instanceof Player)
+    			afterExp(prof,5D,p);
+    	}
+		
+	}
+
 	public static void saveCode(Player p,int ids,HashMap<Integer,Achievement> my_list ){
 		HashMap<String,List<AchievementStatus>> ach_list = AchievementManager.getAllAchievementsStatus();
 		if(ach_list!=null){
@@ -174,11 +189,7 @@ public class MyEventHandler {
     		}
     		try{
     			double exp = BlockValues.valueOf(m.toString()).getValue();
-    			player_prof.addExperience(exp);
-    			p.sendMessage(ChatColor.WHITE+"+"+Double.toString(exp)+" exp");
-    			if(player_prof.checkUpLevel()){
-    				p.sendMessage(ChatColor.BLUE+"Level up!");
-    			}
+    			afterExp(player_prof,exp,p);
     		}catch(Exception ex){
     			System.out.println("Block yet not supported");
     		}
@@ -195,10 +206,19 @@ public class MyEventHandler {
         HumanEntity p = e.getWhoClicked();
         
         if(isWeapon(m.toString()) || isChestPlate(m.toString()) || isLeggings(m.toString()) || isBoots(m.toString())){
-        	p.getInventory().removeItem(new ItemStack(m,1));
-        	Player player = (Player) p;
-        	player.updateInventory();
-        }
+			if(ProfessionManager.getProfessionByName(p.getName()).getPt() != ProfessionType.CRAFTER){
+        	e.getInventory().setResult(new ItemStack(Material.LOG, 1));
+			}else{
+				crafterCrafting(e);
+			}
+		}
+	}
+	
+	public static void crafterCrafting(CraftItemEvent e){
+		Player p = (Player)e.getWhoClicked();
+		Profession player_prof = ProfessionManager.getProfessionByName(p.getName());
+		afterExp(player_prof,1D,p);
+		
 	}
 	
 	public static boolean isWeapon(String test) {
@@ -210,6 +230,15 @@ public class MyEventHandler {
 	    }
 
 	    return false;
+	}
+	
+	public static void afterExp(Profession p, Double exp, Player player){
+		p.addExperience(exp);
+		player.sendMessage(ChatColor.WHITE+"+"+Double.toString(exp)+" exp");
+		for(int i=p.checkUpLevel(); i!=0; --i){
+			player.sendMessage(ChatColor.BLUE+"Level up!");
+		}
+		
 	}
 	public static boolean isChestPlate(String test) {
 
@@ -242,13 +271,18 @@ public class MyEventHandler {
 	    return false;
 	}
 
-	public static void onCustomCraft(PrepareItemCraftEvent e) {
-		Material m = e.getInventory().getResult().getType();
-		if(isWeapon(m.toString()) || isChestPlate(m.toString()) || isLeggings(m.toString()) || isBoots(m.toString())){
-			e.getInventory().setResult(new ItemStack(Material.LOG, 1));
-			}
+	public static void onBlockPlace(BlockPlaceEvent event) {
+		Player p = event.getPlayer();
+		Profession prof = ProfessionManager.getProfessionByName(p.getName());
+		if(prof.getPt() == ProfessionType.BUILDER){
+			//TODO add blockmanager to add different xp values
+			afterExp(prof, 0.5, p);
 		}
-	
+		
 	}
+
+}
+
+
 
 

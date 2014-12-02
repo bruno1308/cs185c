@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import org.bukkit.event.*;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -145,14 +146,16 @@ public class Plugin extends JavaPlugin {
 			@EventHandler
 			public void onCraft(CraftItemEvent e) {
 				
-				//MyEventHandler.onCraftItem(e);
+				MyEventHandler.onCraftItem(e);
 			}
 
 			@EventHandler(priority = EventPriority.HIGH)
 			public void customCrafting(PrepareItemCraftEvent e) {
-				System.out.println("Crafting: "
-						+ e.getRecipe().getResult().getType().toString());
-				MyEventHandler.onCustomCraft(e);
+				//MyEventHandler.onCustomCraft(e);
+			}
+			@EventHandler
+			public void onBlockPlace(BlockPlaceEvent event) {
+		        MyEventHandler.onBlockPlace(event);
 			}
 
 		}, this);
