@@ -16,10 +16,13 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.Recipe;
 
 import edu.sjsu.cs185c.util.MathUtil;
@@ -27,6 +30,7 @@ import edu.sjsu.cs185c.util.MathUtil;
 
 public class MyEventHandler {
 	public final static double MIN_DIST = 5D;
+	
 	public static void onPlayerDeath(PlayerDeathEvent e){
 		if(!(e.getEntity().getKiller() instanceof Player))return;
         String killers_name = e.getEntity().getKiller().getName();
@@ -46,7 +50,15 @@ public class MyEventHandler {
             		killers_karma-=3;
         	}
             
-            }
+        }
+        Double gold_lost = MoneyManager.getBalance(dead_name)/2D;
+        Double penalty = 0D;
+        if(ProfessionManager.getProfessionByName(dead_name).getPt() == ProfessionType.ASSASSIN){
+        	penalty = 0.2;
+        }
+        MoneyManager.setBalance(dead_name, gold_lost*penalty);
+        
+        MoneyManager.setBalance(killers_name, MoneyManager.getBalance(killers_name)+gold_lost);
 		
 	}
 
@@ -304,6 +316,31 @@ public class MyEventHandler {
 			event.setCancelled(true);
 		}
 		
+	}
+
+	public static void onInventoryClick(InventoryClickEvent event) {
+		Player p = (Player)event.getWhoClicked();
+		if(p == null) return;
+		if (event.getInventory().getType().equals(InventoryType.PLAYER) ||event.getInventory().getType().equals(InventoryType.CRAFTING) ){
+			if(ProfessionManager.getProfessionByName(p.getName()).getPt() != ProfessionType.ASSASSIN){
+				if (isInside(AssassinType.DIAMOND_BOOTS, event.getCurrentItem().getType().toString())) {
+					event.setCancelled(true);                
+            }
+		  }
+        }	
+	}
+	
+	public static void onRightClickAir(PlayerInteractEvent e){
+		Player p = e.getPlayer();
+		System.out.println("right cliked");
+		PlayerInventory i = p.getInventory();
+		if(ProfessionManager.getProfessionByName(p.getName()).getPt() != ProfessionType.ASSASSIN){
+			System.out.println("is not assassin, and has "+i.getItemInHand().getType().toString());
+			if(isInside(AssassinType.DIAMOND_BOOTS,i.getItemInHand().getType().toString())){
+				System.out.println("is diamond that has in hand");
+				e.setCancelled(true);
+			}
+		}
 	}
 
 }

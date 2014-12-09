@@ -32,16 +32,19 @@ public class ProfessionCommand implements CommandExecutor{
 				for(ProfessionType pt :types){
 					cs.sendMessage(ChatColor.GREEN+pt.toString());
 				}
+				return true;
 			}else if(args[0].equalsIgnoreCase("get")){
 				if(args.length !=2) {cs.sendMessage(ErrorHandler.WRONG_NUMBER_OF_PARMS.toString()); return false;}
 				if(!MoneyManager.hasAccount(args[1])){cs.sendMessage(ErrorHandler.INEXISTENT_PLAYER.toString()); return false;}
 				ProfessionType type = ProfessionManager.getProfessionByName(args[1]).getPt();
 				cs.sendMessage(ChatColor.GREEN+args[1]+" is a/an "+type.toString());
+				return true;
 			}else if(args[0].equalsIgnoreCase("level")){
 				if(args.length !=2) {cs.sendMessage(ErrorHandler.WRONG_NUMBER_OF_PARMS.toString()); return false;}
 				if(!MoneyManager.hasAccount(args[1])){cs.sendMessage(ErrorHandler.INEXISTENT_PLAYER.toString()); return false;}
 				int level = ProfessionManager.getProfessionByName(args[1]).getLevel();
 				cs.sendMessage(ChatColor.GREEN+args[1]+" is level "+Integer.toString(level));
+				return true;
 			} else {cs.sendMessage(ErrorHandler.INEXISTENT_COMMAND.toString()); return false;}
 		return false;
 	}

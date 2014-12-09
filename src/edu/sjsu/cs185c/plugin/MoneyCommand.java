@@ -89,7 +89,7 @@ public class MoneyCommand implements CommandExecutor {
 				String receiver=args[1];
 				Double my_bal = MoneyManager.getBalance(me.getName());
 				Double amount= Double.parseDouble(args[2]);
-				if(my_bal>=amount){
+				if(my_bal >= amount){
 					MoneyManager.setBalance(me.getName(), my_bal-amount);
 					MoneyManager.setBalance(receiver, MoneyManager.getBalance(receiver) + amount);		
 					cs.sendMessage(ChatColor.GREEN+"Transferred: "+Double.toString(amount)+" to "+receiver);

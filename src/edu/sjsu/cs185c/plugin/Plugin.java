@@ -25,12 +25,15 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
 import org.bukkit.event.*;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.Material;
@@ -145,8 +148,7 @@ public class Plugin extends JavaPlugin {
 
 			@EventHandler
 			public void onCraft(CraftItemEvent e) {
-				
-				MyEventHandler.onCraftItem(e);
+					MyEventHandler.onCraftItem(e);
 			}
 
 			@EventHandler(priority = EventPriority.HIGH)
@@ -157,6 +159,17 @@ public class Plugin extends JavaPlugin {
 			public void onBlockPlace(BlockPlaceEvent event) {
 		        MyEventHandler.onBlockPlace(event);
 			}
+		    @EventHandler (priority = EventPriority.MONITOR, ignoreCancelled = true)
+		    public void onClick(InventoryClickEvent event) {
+		        MyEventHandler.onInventoryClick(event);
+		    }
+		    @EventHandler(ignoreCancelled = true)
+		    public void onPlayerInteract(PlayerInteractEvent event) {
+		    	if (event.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+		    		MyEventHandler.onRightClickAir(event);
+		    	}
+		    }
+
 
 		}, this);
 
