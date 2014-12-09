@@ -22,6 +22,8 @@ public class Profession {
 		wage=100D;
 		if(newpt == ProfessionType.MINER){
 			drop_rate=10;
+		}else if(newpt == ProfessionType.UNEMPLOYED){
+			wage = 0D;
 		}
 	}
 	public ProfessionType getPt() {

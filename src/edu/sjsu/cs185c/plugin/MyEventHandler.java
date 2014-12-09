@@ -270,13 +270,38 @@ public class MyEventHandler {
 
 	    return false;
 	}
+	
+	public static boolean isExclusiveBuilder(String test){
+		for (BuilderType b : BuilderType.values()) {
+	        if (b.name().equals(test)) {
+	            return true;
+	        }
+	    }
+
+	    return false;
+	}
+	
+	public static <E extends Enum<E>>  boolean isInside(E e, String test){
+			 for (Enum<E> c : e.getClass().getEnumConstants()) {
+			        if (c.name().equalsIgnoreCase(test)) {
+			            return true;
+			        }
+			    }
+
+			    return false;
+
+	}
 
 	public static void onBlockPlace(BlockPlaceEvent event) {
 		Player p = event.getPlayer();
 		Profession prof = ProfessionManager.getProfessionByName(p.getName());
+		Block b  = event.getBlockPlaced();
 		if(prof.getPt() == ProfessionType.BUILDER){
 			//TODO add blockmanager to add different xp values
 			afterExp(prof, 0.5, p);
+		}else{
+			if(isInside(BuilderType.BRICK ,b.getType().toString()))
+			event.setCancelled(true);
 		}
 		
 	}

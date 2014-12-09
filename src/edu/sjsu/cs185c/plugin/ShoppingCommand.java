@@ -29,6 +29,7 @@ public class ShoppingCommand implements CommandExecutor {
 					sender.getInventory().addItem(new ItemStack(m, 1));
 					//sender.getInventory().set
 					cs.sendMessage(ChatColor.YELLOW+"Bought "+m.toString()+ " for $"+price);
+					return true;
 				}else{
 					cs.sendMessage(ErrorHandler.NOT_ENOUGH_MONEY.toString()); return false;
 				}
@@ -68,13 +69,14 @@ public class ShoppingCommand implements CommandExecutor {
 			Material m = Material.getMaterial(args[1].toUpperCase());
 			if(prices.containsKey(m) && m!= null){
 				cs.sendMessage(ChatColor.BLUE+"It costs "+prices.get(m));
+				return true;
 			}else{
 				cs.sendMessage(ErrorHandler.INEXISTENT_ITEM.toString()); return false;
 			}
 		}else{
 			cs.sendMessage(ErrorHandler.INEXISTENT_COMMAND.toString()); return false;
 		}
-		return false;
+		
 	}
 	/*public static void removeInventoryItems(PlayerInventory inv, Material type, int amount) {
         for (ItemStack is : inv.getContents()) {
